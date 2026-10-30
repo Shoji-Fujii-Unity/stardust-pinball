@@ -171,7 +171,7 @@
   @keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   #flash{position:absolute;inset:0;z-index:9;pointer-events:none;background:#fff;opacity:0}
   #flash.go{animation:fl .28s ease-out}
-  @keyframes fl{0%{opacity:.5}100%{opacity:0}}
+  @keyframes fl{0%{opacity:var(--flash-opacity,.5)}100%{opacity:0}}
 </style>
 </head>
 <body>
@@ -510,7 +510,9 @@ const Snd = {
     }, 250);
   }
 };
-const buzz = (ms) => { if (save.vib && navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) { } } };
+let vibrationReady = false;
+window.addEventListener('pointerdown', () => { vibrationReady = true; }, { once: true, passive: true });
+const buzz = (ms) => { if (vibrationReady && save.vib && navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) { } } };
 
 /* ---------------- 12 tables ---------------- */
 // art: procedural playfield art style · phys: physics feel · field: layout modules
@@ -1569,7 +1571,7 @@ function pop(x, y, text, color) {
   setTimeout(() => d.remove(), 1000);
 }
 function flashScreen(op) {
-  E.flash.style.opacity = op || '';
+  E.flash.style.setProperty('--flash-opacity', op || .5);
   E.flash.classList.remove('go'); void E.flash.offsetWidth; E.flash.classList.add('go');
 }
 let shakeAmt = 0;
